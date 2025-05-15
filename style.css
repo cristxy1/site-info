@@ -1,0 +1,494 @@
+:root {
+    /* Culori principale */
+    --bg-light: #fff8f0;        /* crem deschis */
+    --bg-dark: #1a1a40;         /* albastru închis */
+    --text-light: #222222;      /* gri închis */
+    --text-dark: #f0e6f6;       /* lavandă deschis */
+    --primary: #ff6f61;         /* corai aprins */
+    --secondary: #ffa726;       /* portocaliu vibrant */
+    --accent: #42a5f5;          /* albastru electric */
+    --card: #ffffff;            /* alb curat */
+    --card-dark: #2c2c55;       /* albastru închis pentru dark mode */
+    --shadow-light: rgba(255, 111, 97, 0.3); /* umbră corai */
+    --shadow-dark: rgba(0,0,0,0.7);
+    --border-radius: 12px;
+    --transition-speed: 0.3s;
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Reset minimal */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body, h1, h2, h3, p, ul, li, nav, section, header, footer, main, button, input, select, textarea {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-light);
+    line-height: 1.6;
+    min-height: 100vh;
+    transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+}
+
+/* Dark mode */
+body.dark {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+}
+
+/* 2. HEADER & NAVBAR */
+header {
+    background-color: var(--primary);
+    color: white;
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    box-shadow: 0 4px 15px var(--shadow-light);
+    z-index: 10000;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    flex: 1 1 300px;
+}
+
+nav {
+    flex: 2 1 500px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1.5rem;
+}
+
+nav ul li {
+    position: relative;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 0.3rem 0;
+    display: inline-block;
+    transition: color var(--transition-speed);
+}
+
+nav a:hover,
+nav a.active {
+    color: var(--accent);
+}
+
+nav a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 0%;
+    height: 2px;
+    background-color: var(--accent);
+    transition: width var(--transition-speed);
+}
+
+nav a:hover::after,
+nav a.active::after {
+    width: 100%;
+}
+
+#toggle-theme {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+    flex-shrink: 0;
+}
+
+#toggle-theme:hover {
+    background-color: white;
+    color: var(--primary);
+}
+
+/* 3. MAIN CONTENT AREA */
+main {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+    animation: fadeIn 0.7s ease-in;
+}
+
+section {
+    background-color: var(--card);
+    padding: 1.8rem 2rem;
+    margin-bottom: 2.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 6px 20px var(--shadow-light);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+body.dark section {
+    background-color: var(--card-dark);
+    box-shadow: 0 6px 20px var(--shadow-dark);
+}
+
+section:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 10px 30px var(--shadow-light);
+}
+
+section h2 {
+    margin-bottom: 1rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+    border-bottom: 2px solid var(--secondary);
+    padding-bottom: 0.4rem;
+    color: var(--primary);
+}
+
+/* 4. NOTIȚE LISTĂ */
+#notite-lista {
+    background: var(--bg-light);
+    border-radius: var(--border-radius);
+    padding: 1rem 1.2rem;
+    box-shadow: 0 3px 15px var(--shadow-light);
+}
+
+body.dark #notite-lista {
+    background: var(--bg-dark);
+}
+
+.notita {
+    border-bottom: 1px solid #ddd;
+    padding: 0.8rem 0;
+    transition: background-color var(--transition-speed);
+}
+
+.notita:last-child {
+    border-bottom: none;
+}
+
+.notita h3 {
+    font-size: 1.2rem;
+    color: var(--primary);
+    margin-bottom: 0.3rem;
+}
+
+.notita p {
+    font-size: 1rem;
+    color: var(--text-light);
+}
+
+body.dark .notita p {
+    color: var(--text-dark);
+}
+
+.notita small {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+/* 5. INPUT, SELECT & BUTTON */
+input[type="text"],
+select,
+textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font-size: 1.1rem;
+    border-radius: var(--border-radius);
+    border: 1.8px solid #ccc;
+    outline-offset: 3px;
+    transition: border-color var(--transition-speed), background-color var(--transition-speed);
+    font-family: var(--font-family);
+}
+
+input[type="text"]:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--accent);
+    background-color: #fffbee;
+    box-shadow: 0 0 10px var(--accent);
+}
+
+body.dark input[type="text"],
+body.dark select,
+body.dark textarea {
+    background-color: #3a3a7a;
+    border-color: #555;
+    color: var(--text-dark);
+}
+
+body.dark input[type="text"]:focus,
+body.dark select:focus,
+body.dark textarea:focus {
+    background-color: #4b4b87;
+    border-color: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+}
+
+button, #export-notes {
+    background-color: var(--secondary);
+    color: white;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    font-size: 1.1rem;
+    border-radius: var(--border-radius);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color var(--transition-speed);
+}
+
+button:hover, #export-notes:hover {
+    background-color: var(--accent);
+}
+
+/* 6. FILTRARE & EDITOR ACTIONS */
+.editor-actions,
+.filtrare {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.filtrare label {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.filtrare select {
+    max-width: 200px;
+}
+
+/* 7. FOOTER */
+footer {
+    width: 100%;
+    background-color: var(--primary);
+    color: white;
+    text-align: center;
+    padding: 1rem 2rem;
+    font-size: 0.9rem;
+    box-shadow: 0 -4px 10px var(--shadow-light);
+    position: relative;
+    bottom: 0;
+    left: 0;
+}
+
+footer ul {
+    list-style: none;
+    padding: 0;
+    margin: 0.8rem 0 0 0;
+    display: flex;
+    justify-content: center;
+    gap: 1.8rem;
+    flex-wrap: wrap;
+}
+
+footer ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    border-bottom: 2px solid transparent;
+    transition: border-color var(--transition-speed);
+}
+
+footer ul li a:hover {
+    border-bottom: 2px solid var(--secondary);
+}
+
+/* 8. WELCOME PAGE */
+#welcome {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+    text-align: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 40px var(--shadow-light);
+    animation: slideInFade 1s ease forwards;
+    margin: 2rem auto;
+    max-width: 700px;
+}
+
+#welcome h2 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.3);
+}
+
+#welcome p {
+    font-size: 1.3rem;
+    font-weight: 500;
+    max-width: 520px;
+    margin: 0 auto 1.6rem auto;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+#welcome button {
+    padding: 0.8rem 2rem;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: var(--border-radius);
+    background-color: white;
+    color: var(--primary);
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(255,111,97,0.6);
+    transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+#welcome button:hover {
+    background-color: var(--accent);
+    color: white;
+    box-shadow: 0 5px 20px rgba(255, 111, 97, 0.8);
+}
+
+/* 9. ANIMAȚII */
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+@keyframes slideInFade {
+    from {opacity: 0; transform: translateX(-80px);}
+    to {opacity: 1; transform: translateX(0);}
+}
+
+/* 10. RESPONSIVE */
+/* TABLET & SMALL DESKTOP */
+@media (max-width: 900px) {
+    main {
+        padding: 0 1rem;
+    }
+    header h1 {
+        font-size: 1.6rem;
+    }
+    nav ul {
+        justify-content: center;
+        gap: 1rem;
+    }
+    #welcome {
+        width: 90%;
+        height: auto;
+    }
+}
+
+/* MOBILE & SMALLER */
+@media (max-width: 600px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem 1rem;
+    }
+    header h1 {
+        margin-bottom: 0.8rem;
+        font-size: 1.4rem;
+    }
+    nav ul {
+        flex-direction: column;
+        width: 100%;
+        gap: 1rem;
+        background-color: var(--primary);
+        padding: 1rem 1.5rem;
+        border-radius: var(--border-radius);
+        box-shadow: 0 10px 25px var(--shadow-light);
+    }
+    nav ul li {
+        width: 100%;
+    }
+    nav a {
+        display: block;
+        padding: 0.8rem 0;
+        font-size: 1.2rem;
+        width: 100%;
+    }
+    #toggle-theme {
+        align-self: center;
+        margin-top: 1rem;
+        padding: 0.6rem 1.4rem;
+        font-size: 1rem;
+    }
+    main {
+        margin: 1rem auto;
+        padding: 0 1rem;
+        max-width: 100%;
+    }
+    #welcome {
+        height: auto;
+        padding: 1.5rem;
+        margin: 1rem 0;
+    }
+}
+
+/* 11. ACCESIBILITATE */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus,
+a:focus {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+}
+
+/* 12. UTILS */
+.text-center {
+    text-align: center;
+}
+.mb-2 {
+    margin-bottom: 1rem;
+}
+.mb-1 {
+    margin-bottom: 0.5rem;
+}
+.p-2 {
+    padding: 1rem;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  min-height: 100vh;
+}
+
+main {
+  flex: 1; /* preia tot spațiul disponibil pentru conținut */
+}
+
+footer {
+  background-color: var(--primary);
+  color: white;
+  text-align: center;
+  padding: 1rem 2rem;
+  font-size: 0.9rem;
+  box-shadow: 0 -4px 10px var(--shadow-light);
+}
+
