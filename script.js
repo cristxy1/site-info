@@ -1,6 +1,6 @@
 // script.js - Caiet Virtual
 
-// Trecere între mod light/dark
+// --- Toggle tema light/dark ---
 const toggleThemeBtn = document.getElementById('toggle-theme');
 if (toggleThemeBtn) {
     toggleThemeBtn.addEventListener('click', () => {
@@ -9,7 +9,7 @@ if (toggleThemeBtn) {
     });
 }
 
-// Aplică tema salvată la încărcarea paginii
+// --- Aplică tema salvată la încărcarea paginii ---
 window.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
@@ -21,13 +21,33 @@ window.addEventListener('DOMContentLoaded', () => {
     gestioneazaLectii();
 });
 
-// Salvare notiță din editor
+// --- Funcție de sanitizare input simplă (evită tag-uri HTML) ---
+function sanitizeInput(input) {
+    const temp = document.createElement('div');
+    temp.textContent = input;
+    return temp.innerHTML;
+}
+
+// --- Funcție simplă de escapare HTML pentru siguranță la afișare ---
+function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;")
+               .replace(/</g, "&lt;")
+               .replace(/>/g, "&gt;")
+               .replace(/"/g, "&quot;")
+               .replace(/'/g, "&#039;");
+}
+
+// --- Salvează notiță din editor ---
 const saveNoteBtn = document.getElementById('save-note');
 if (saveNoteBtn) {
     saveNoteBtn.addEventListener('click', () => {
-        const titlu = document.getElementById('note-title').value;
-        const continut = document.getElementById('note-content').value;
-        const categorie = document.getElementById('note-category').value;
+        const titluRaw = document.getElementById('note-title').value;
+        const continutRaw = document.getElementById('note-content').value;
+        const categorieRaw = document.getElementById('note-category').value;
+
+        const titlu = sanitizeInput(titluRaw.trim());
+        const continut = sanitizeInput(continutRaw.trim());
+        const categorie = sanitizeInput(categorieRaw.trim());
 
         if (titlu && continut) {
             const notita = {
@@ -37,30 +57,35 @@ if (saveNoteBtn) {
                 data: new Date().toLocaleString(),
                 favorit: false
             };
+
             const notite = JSON.parse(localStorage.getItem('notite') || '[]');
             notite.push(notita);
             localStorage.setItem('notite', JSON.stringify(notite));
+
             alert('Notiță salvată cu succes!');
+            afiseazaNotite();
+            actualizeazaDashboard();
         } else {
             alert('Completează titlul și conținutul notiței!');
         }
     });
 }
 
-// Export notițe în fișier .txt
-const saveAsTxtBtn = document.getElementById('save-as-txt');  // Asigură-te că ai acest buton în editor.html
+// --- Export notițe în .txt ---
+const saveAsTxtBtn = document.getElementById('save-as-txt');
 if (saveAsTxtBtn) {
     saveAsTxtBtn.addEventListener('click', () => {
-        const titlu = document.getElementById('note-title').value;
-        const continut = document.getElementById('note-content').value;
+        const titluRaw = document.getElementById('note-title').value.trim();
+        const continutRaw = document.getElementById('note-content').value.trim();
 
-        if (titlu && continut) {
-            const notaText = `Titlu: ${titlu}\n\nContinut:\n${continut}`;
+        if (titluRaw && continutRaw) {
+            // Folosim titluRaw pentru numele fișierului fără escape (fișier text)
+            const notaText = `Titlu: ${titluRaw}\n\nContinut:\n${continutRaw}`;
             const blob = new Blob([notaText], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `${titlu}.txt`;  // Fișierul va fi numit după titlu
+            a.download = `${titluRaw}.txt`;
             a.click();
             URL.revokeObjectURL(url);
         } else {
@@ -69,10 +94,20 @@ if (saveAsTxtBtn) {
     });
 }
 
-// Afișare în dashboard și caiet
+// --- Funcție debounce pentru optimizarea căutării ---
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+// --- Afișează notițe în dashboard și caiet ---
 function afiseazaNotite() {
     const lista = document.getElementById('notite-lista');
     if (!lista) return;
+
     const notite = JSON.parse(localStorage.getItem('notite') || '[]');
 
     if (notite.length === 0) {
@@ -115,8 +150,11 @@ function afiseazaNotite() {
         btn.addEventListener('click', (e) => {
             const container = e.target.closest('.notita');
             const index = parseInt(container.dataset.index);
-            const newTitle = container.querySelector('.edit-title').value.trim();
-            const newContent = container.querySelector('.edit-content').value.trim();
+            const newTitleRaw = container.querySelector('.edit-title').value.trim();
+            const newContentRaw = container.querySelector('.edit-content').value.trim();
+
+            const newTitle = sanitizeInput(newTitleRaw);
+            const newContent = sanitizeInput(newContentRaw);
 
             if (!newTitle || !newContent) {
                 alert('Titlul și conținutul nu pot fi goale.');
@@ -124,19 +162,22 @@ function afiseazaNotite() {
             }
 
             const notite = JSON.parse(localStorage.getItem('notite') || '[]');
-            notite[index].titlu = newTitle;
-            notite[index].continut = newContent;
-            notite[index].data = new Date().toLocaleString();
+            notite[index] = {
+                ...notite[index],
+                titlu: newTitle,
+                continut: newContent,
+                data: new Date().toLocaleString()
+            };
 
             localStorage.setItem('notite', JSON.stringify(notite));
-            afiseazaNotite(); // Reafișează după salvare
+            afiseazaNotite();
             actualizeazaDashboard();
         });
     });
 
     document.querySelectorAll('.cancel-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            afiseazaNotite(); // reîncarcă notițele pentru a renunța la modificări
+        btn.addEventListener('click', () => {
+            afiseazaNotite();
         });
     });
 }
@@ -147,35 +188,30 @@ function toggleEditButtons(container, editing) {
     container.querySelector('.cancel-btn').style.display = editing ? 'inline-block' : 'none';
 }
 
-// Funcție simplă de escapare HTML pentru siguranță
-function escapeHtml(text) {
-    return text.replace(/&/g, "&amp;")
-               .replace(/</g, "&lt;")
-               .replace(/>/g, "&gt;")
-               .replace(/"/g, "&quot;")
-               .replace(/'/g, "&#039;");
-}
-
-// Căutare notițe
+// --- Căutare notițe cu debounce pentru performanță ---
 const searchBox = document.getElementById('search-notes');
 if (searchBox) {
-    searchBox.addEventListener('input', () => {
+    searchBox.addEventListener('input', debounce(() => {
         const query = searchBox.value.toLowerCase();
         const lista = document.getElementById('notite-lista');
         const notite = JSON.parse(localStorage.getItem('notite') || '[]');
         const filtrate = notite.filter(n => n.titlu.toLowerCase().includes(query) || n.continut.toLowerCase().includes(query));
 
         lista.innerHTML = '';
+        if(filtrate.length === 0) {
+            lista.innerHTML = '<p>Nu există notițe care să corespundă căutării.</p>';
+            return;
+        }
         filtrate.forEach(n => {
             const div = document.createElement('div');
             div.className = 'notita';
-            div.innerHTML = `<h3>${n.titlu}</h3><p>${n.continut.substring(0,100)}...</p>`;
+            div.innerHTML = `<h3>${escapeHtml(n.titlu)}</h3><p>${escapeHtml(n.continut.substring(0,100))}...</p>`;
             lista.appendChild(div);
         });
-    });
+    }, 300));
 }
 
-// Lecții interactive
+// --- Lecții interactive ---
 function gestioneazaLectii() {
     const butoane = document.querySelectorAll('.start-lesson');
     const container = document.getElementById('lesson-details');
@@ -195,7 +231,7 @@ function gestioneazaLectii() {
     });
 }
 
-// Dashboard actualizare
+// --- Dashboard actualizare ---
 function actualizeazaDashboard() {
     const total = document.getElementById('total-notes');
     const update = document.getElementById('last-update');
@@ -204,10 +240,12 @@ function actualizeazaDashboard() {
     if (total) total.textContent = notite.length;
     if (update && notite.length > 0) {
         update.textContent = notite[notite.length - 1].data;
+    } else if (update) {
+        update.textContent = '-';
     }
 }
 
-// Export notițe
+// --- Export notițe JSON backup ---
 const exportBtn = document.getElementById('export-notes') || document.getElementById('download-backup');
 if (exportBtn) {
     exportBtn.addEventListener('click', () => {
@@ -222,53 +260,53 @@ if (exportBtn) {
     });
 }
 
-// Curățare toate notițele
+// --- Ștergere toate notițele ---
 const stergeBtn = document.getElementById('clear-all');
 if (stergeBtn) {
     stergeBtn.addEventListener('click', () => {
         if (confirm('Sigur vrei să ștergi toate notițele?')) {
             localStorage.removeItem('notite');
-            location.reload();
+            afiseazaNotite();
+            actualizeazaDashboard();
         }
     });
 }
 
-// Previzualizare în editor
+// --- Previzualizare conținut notiță în editor ---
 const noteContent = document.getElementById('note-content');
 if (noteContent) {
     noteContent.addEventListener('input', () => {
         const preview = document.getElementById('note-preview-content');
-        preview.textContent = noteContent.value;
+        if(preview) preview.textContent = noteContent.value;
     });
 }
 
-// Curățare formular
+// --- Curățare formular notiță ---
 const clearNoteBtn = document.getElementById('clear-note');
 if (clearNoteBtn) {
     clearNoteBtn.addEventListener('click', () => {
         document.getElementById('note-title').value = '';
         document.getElementById('note-content').value = '';
-        document.getElementById('note-preview-content').textContent = '';
+        const preview = document.getElementById('note-preview-content');
+        if(preview) preview.textContent = '';
     });
 }
 
+// --- Salutare utilizator ---
 document.addEventListener("DOMContentLoaded", () => {
-  const startBtn = document.getElementById("start-btn");
-  const userNameInput = document.getElementById("user-name-input");
+    const startBtn = document.getElementById("start-btn");
+    const userNameInput = document.getElementById("user-name-input");
 
-  startBtn.addEventListener("click", () => {
-    const name = userNameInput.value.trim();
-
-    if (name === "") {
-      alert("Te rog să introduci un nume.");
-      return;
+    if (startBtn && userNameInput) {
+        startBtn.addEventListener("click", () => {
+            const userName = sanitizeInput(userNameInput.value.trim());
+            if (!userName) {
+                alert("Te rog să introduci numele tău.");
+                return;
+            }
+            localStorage.setItem("userName", userName);
+            alert(`Salut, ${userName}! Să începem notițele!`);
+        });
     }
-
-    // Salvăm numele în localStorage
-    localStorage.setItem("userName", name);
-
-    // Redirecționează către dashboard
-    window.location.href = "dashboard.html"; // Înlocuiește cu numele fișierului tău dacă diferă
-  });
 });
 

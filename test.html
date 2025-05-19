@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8" />
+    <title>Testare Jasmine</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine.css" />
+</head>
+<body>
+
+<script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/jasmine-html.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/boot0.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jasmine-core/lib/jasmine-core/boot1.js"></script>
+
+<!-- Include codul tău JavaScript aici -->
+<script src="script.js"></script>
+
+<script>
+// Exemplu simplu de test pentru funcția escapeHtml
+
+describe("escapeHtml", function() {
+    it("scapă caracterele HTML periculoase", function() {
+        expect(escapeHtml('<script>')).toBe('&lt;script&gt;');
+        expect(escapeHtml('a & b')).toBe('a &amp; b');
+        expect(escapeHtml('"test"')).toBe('&quot;test&quot;');
+        expect(escapeHtml("O'Reilly")).toBe('O&#039;Reilly');
+    });
+});
+</script>
+
+</body>
+</html>
